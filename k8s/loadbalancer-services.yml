@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-lb
+  namespace: dryfruit
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-lb
+  namespace: dryfruit
+spec:
+  selector:
+    app: jaeger
+  ports:
+    - port: 16686
+      targetPort: 16686
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-lb
+  namespace: dryfruit
+spec:
+  selector:
+    app: eureka-server
+  ports:
+    - port: 8761
+      targetPort: 8761
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-lb
+  namespace: dryfruit
+spec:
+  selector:
+    app: inventory-service
+  ports:
+    - port: 8082
+      targetPort: 8082
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-lb
+  namespace: dryfruit
+spec:
+  selector:
+    app: shipping-service
+  ports:
+    - port: 8083
+      targetPort: 8083
+  type: LoadBalancer

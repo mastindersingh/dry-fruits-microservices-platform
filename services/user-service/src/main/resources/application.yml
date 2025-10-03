@@ -1,0 +1,60 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://postgres-users:5432/user_db
+    username: user_service
+    password: user_pass123
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: admin
+    password: admin123
+
+# Remove Eureka for now - simplify the setup
+# eureka:
+#   client:
+#     service-url:
+#       defaultZone: http://eureka-server:8761/eureka/
+#   instance:
+#     prefer-ip-address: true
+
+# JWT Configuration
+jwt:
+  secret: dryfruits-platform-secret-key-2025
+  expiration: 86400000
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    com.dryfruits.platform.userservice: INFO
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

@@ -1,0 +1,127 @@
+server:
+  port: 8085
+  servlet:
+    context-path: /shipping/v1
+
+spring:
+  application:
+    name: shipping-service
+  
+  profiles:
+    active: local
+    
+  datasource:
+    url: jdbc:postgresql://postgres-shared:5432/dryfruits_db
+    username: dryfruits_user
+    password: dryfruits_pass123
+    driver-class-name: org.postgresql.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        
+  redis:
+    host: redis
+    port: 6379
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+        
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: admin
+    password: admin123
+
+# Observability Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
+  tracing:
+    sampling:
+      probability: 1.0
+    zipkin:
+      endpoint: http://jaeger:9411/api/v2/spans
+    
+# Logging Configuration
+logging:
+  level:
+    com.dryfruits.platform: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    io.opentelemetry: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg [%X{traceId:-},%X{spanId:-}]%n"
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+    
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+
+# Shipping Configuration
+shipping:
+  providers:
+    fedex:
+      enabled: true
+      api-key: ${FEDEX_API_KEY:test-key}
+      account-number: ${FEDEX_ACCOUNT:123456789}
+    ups:
+      enabled: true
+      api-key: ${UPS_API_KEY:test-key}
+      account-number: ${UPS_ACCOUNT:987654321}
+    usps:
+      enabled: true
+      api-key: ${USPS_API_KEY:test-key}
+  rates:
+    cache-duration: PT1H
+    
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+      
+  datasource:
+    url: jdbc:postgresql://postgres-shipping:5432/shipping_db
+    
+  redis:
+    host: redis
+    
+  rabbitmq:
+    host: rabbitmq
+    
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/

@@ -1,0 +1,97 @@
+receivers:
+  - name: processors
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+  
+  resource:
+    attributes:
+      - key: service.name
+        action: upsert
+        from_attribute: service_name
+      - key: service.version
+        value: "1.0.0"
+        action: upsert
+
+  # Memory limiter to prevent OOM
+  memory_limiter:
+    limit_mib: 512
+
+exporters:
+  # Jaeger for tracing
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+
+  # Prometheus for metrics
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: "dryfruits"
+
+  # Logging exporter for debugging
+  logging:
+    loglevel: info
+
+  # OTLP exporters for external services
+  # Datadog
+  otlp/datadog:
+    endpoint: https://api.datadoghq.com
+    headers:
+      DD-API-KEY: "${DATADOG_API_KEY}"
+    tls:
+      insecure: false
+
+  # Splunk
+  splunk_hec:
+    endpoint: "${SPLUNK_HEC_URL}"
+    token: "${SPLUNK_HEC_TOKEN}"
+    source: "otel"
+    sourcetype: "_json"
+    index: "main"
+
+  # Elastic APM
+  otlp/elastic:
+    endpoint: "${ELASTIC_APM_SERVER_URL}"
+    headers:
+      Authorization: "Bearer ${ELASTIC_APM_SECRET_TOKEN}"
+
+  # New Relic
+  otlp/newrelic:
+    endpoint: https://otlp.nr-data.net:4317
+    headers:
+      api-key: "${NEW_RELIC_LICENSE_KEY}"
+
+service:
+  pipelines:
+    # Traces pipeline
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [jaeger, logging, otlp/datadog, otlp/elastic, otlp/newrelic]
+
+    # Metrics pipeline
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [prometheus, logging, otlp/datadog, otlp/elastic, otlp/newrelic]
+
+    # Logs pipeline
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [logging, splunk_hec, otlp/datadog, otlp/elastic]
+
+  extensions: [health_check]
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133

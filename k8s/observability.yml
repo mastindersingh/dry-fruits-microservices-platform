@@ -1,0 +1,400 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: dryfruit
+data:
+  prometheus.yml: |
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://prometheus:9090
+      isDefault: true
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: dryfruit
+data:
+  dashboard.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Dry Fruits Microservices Overview",
+        "tags": ["microservices", "dryfruits"],
+        "timezone": "browser",
+        "editable": true,
+        "fiscalYearStartMonth": 0,
+        "graphTooltip": 0,
+        "links": [],
+        "liveNow": false,
+        "panels": [
+          {
+            "id": 1,
+            "title": "Service Health Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up{job=~\"inventory-service|shipping-service|eureka-server\"}",
+                "legendFormat": "{{job}}",
+                "refId": "A"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "steps": [
+                    {"color": "red", "value": 0},
+                    {"color": "green", "value": 1}
+                  ]
+                }
+              }
+            },
+            "options": {
+              "colorMode": "background"
+            },
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0}
+          },
+          {
+            "id": 2,
+            "title": "HTTP Request Rate (req/sec)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(http_server_requests_seconds_count{job=~\"inventory-service|shipping-service|eureka-server\"}[5m])",
+                "legendFormat": "{{job}} - {{method}} {{uri}}",
+                "refId": "A"
+              }
+            ],
+            "yAxes": [
+              {"label": "Requests/sec", "min": 0}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+          },
+          {
+            "id": 3,
+            "title": "HTTP Response Time (95th percentile)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{job=~\"inventory-service|shipping-service|eureka-server\"}[5m]))",
+                "legendFormat": "{{job}} - 95th percentile",
+                "refId": "A"
+              }
+            ],
+            "yAxes": [
+              {"label": "Seconds", "min": 0}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+          },
+          {
+            "id": 4,
+            "title": "JVM Memory Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "jvm_memory_used_bytes{job=~\"inventory-service|shipping-service|eureka-server\", area=\"heap\"}",
+                "legendFormat": "{{job}} - Heap Used",
+                "refId": "A"
+              },
+              {
+                "expr": "jvm_memory_max_bytes{job=~\"inventory-service|shipping-service|eureka-server\", area=\"heap\"}",
+                "legendFormat": "{{job}} - Heap Max",
+                "refId": "B"
+              }
+            ],
+            "yAxes": [
+              {"label": "Bytes"}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+          },
+          {
+            "id": 5,
+            "title": "Database Connection Pool",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "hikaricp_connections_active{job=~\"inventory-service|shipping-service\"}",
+                "legendFormat": "{{job}} - Active Connections",
+                "refId": "A"
+              },
+              {
+                "expr": "hikaricp_connections_max{job=~\"inventory-service|shipping-service\"}",
+                "legendFormat": "{{job}} - Max Connections",
+                "refId": "B"
+              }
+            ],
+            "yAxes": [
+              {"label": "Connections"}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+          },
+          {
+            "id": 6,
+            "title": "Error Rate (4xx/5xx responses)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(http_server_requests_seconds_count{job=~\"inventory-service|shipping-service|eureka-server\", status=~\"4..|5..\"}[5m])",
+                "legendFormat": "{{job}} - {{status}} errors",
+                "refId": "A"
+              }
+            ],
+            "yAxes": [
+              {"label": "Errors/sec", "min": 0}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+          },
+          {
+            "id": 7,
+            "title": "System CPU Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "system_cpu_usage{job=~\"inventory-service|shipping-service|eureka-server\"}",
+                "legendFormat": "{{job}} - CPU Usage",
+                "refId": "A"
+              }
+            ],
+            "yAxes": [
+              {"label": "Percentage", "min": 0, "max": 1}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+          }
+        ],
+        "time": {
+          "from": "now-15m",
+          "to": "now"
+        },
+        "timepicker": {},
+        "refresh": "5s",
+        "version": 1
+      }
+    }
+          "title": "Service Health",
+          "type": "table",
+          "targets": [
+            {
+              "expr": "up{job=~\"inventory-service|shipping-service|eureka-server\"}",
+              "legendFormat": "{{job}}"
+            }
+          ],
+          "gridPos": {"h": 6, "w": 24, "x": 0, "y": 8}
+        },
+        {
+          "title": "Database Connections",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "hikaricp_connections_active{job=~\"inventory-service|shipping-service\"}",
+              "legendFormat": "{{job}} - Active"
+            },
+            {
+              "expr": "hikaricp_connections_idle{job=~\"inventory-service|shipping-service\"}",
+              "legendFormat": "{{job}} - Idle"
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 14}
+        },
+        {
+          "title": "Response Time (95th percentile)",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{job=~\"inventory-service|shipping-service|eureka-server\"}[5m]))",
+              "legendFormat": "{{job}} - 95th percentile"
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 14}
+        }
+      ],
+      "time": {"from": "now-1h", "to": "now"},
+      "refresh": "30s"
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-provider
+  namespace: dryfruit
+data:
+  dashboards.yml: |
+    apiVersion: 1
+    providers:
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      updateIntervalSeconds: 10
+      allowUiUpdates: true
+      options:
+        path: /var/lib/grafana/dashboards
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: dryfruit
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: dryfruit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus:latest
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+        - name: config
+          mountPath: /etc/prometheus
+        imagePullPolicy: IfNotPresent
+      volumes:
+      - name: config
+        configMap:
+          name: prometheus-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: dryfruit
+spec:
+  selector:
+    app: grafana
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: dryfruit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: "grafana123"
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: grafana-dashboards-provider
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards
+        imagePullPolicy: IfNotPresent
+      volumes:
+      - name: grafana-storage
+        emptyDir: {}
+      - name: grafana-datasources
+        configMap:
+          name: grafana-datasources
+      - name: grafana-dashboards-provider
+        configMap:
+          name: grafana-dashboards-provider
+      - name: grafana-dashboards
+        configMap:
+          name: grafana-dashboards
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger
+  namespace: dryfruit
+spec:
+  selector:
+    app: jaeger
+  ports:
+    - port: 16686
+      targetPort: 16686
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger
+  namespace: dryfruit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jaeger
+  template:
+    metadata:
+      labels:
+        app: jaeger
+    spec:
+      containers:
+      - name: jaeger
+        image: jaegertracing/all-in-one:latest
+        ports:
+        - containerPort: 16686
+        env:
+        - name: COLLECTOR_OTLP_ENABLED
+          value: "true"
+        imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: dryfruit
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+    scrape_configs:
+      - job_name: 'eureka-server'
+        static_configs:
+          - targets: ['eureka-server:8761']
+        metrics_path: '/actuator/prometheus'
+      - job_name: 'inventory-service'
+        static_configs:
+          - targets: ['inventory-service:8082']
+        metrics_path: '/inventory/v1/actuator/prometheus'
+      - job_name: 'shipping-service'
+        static_configs:
+          - targets: ['shipping-service:8083']
+        metrics_path: '/shipping/v1/actuator/prometheus'

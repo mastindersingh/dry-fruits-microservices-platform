@@ -1,0 +1,299 @@
+services:
+  # Infrastructure Services
+  
+  # Databases first (most basic)
+  postgres-users:
+    image: postgres:15-alpine
+    container_name: postgres-users
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: user_service
+      POSTGRES_PASSWORD: user_pass123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_users_data:/var/lib/postgresql/data
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  # Cache & Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  # Simple message queue
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  # Additional Databases
+  postgres-products:
+    image: postgres:15-alpine
+    container_name: postgres-products
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: product_service
+      POSTGRES_PASSWORD: product_pass123
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_products_data:/var/lib/postgresql/data
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  postgres-inventory:
+    image: postgres:15-alpine
+    container_name: postgres-inventory
+    environment:
+      POSTGRES_DB: inventory_db
+      POSTGRES_USER: inventory_service
+      POSTGRES_PASSWORD: inventory_pass123
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_inventory_data:/var/lib/postgresql/data
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  postgres-shipping:
+    image: postgres:15-alpine
+    container_name: postgres-shipping
+    environment:
+      POSTGRES_DB: shipping_db
+      POSTGRES_USER: shipping_service
+      POSTGRES_PASSWORD: shipping_pass123
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_shipping_data:/var/lib/postgresql/data
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  postgres-orders:
+    image: postgres:15-alpine
+    container_name: postgres-orders
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: order_service
+      POSTGRES_PASSWORD: order_pass123
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_orders_data:/var/lib/postgresql/data
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  postgres-payments:
+    image: postgres:15-alpine
+    container_name: postgres-payments
+    environment:
+      POSTGRES_DB: payment_db
+      POSTGRES_USER: payment_service
+      POSTGRES_PASSWORD: payment_pass123
+    ports:
+      - "5437:5432"
+    volumes:
+      - postgres_payments_data:/var/lib/postgresql/data
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  # Eureka Service Discovery
+  eureka-server:
+    build:
+      context: ./services/eureka-server
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  # Microservices
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres-users
+      - rabbitmq
+      - eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-users:5432/user_db
+      - SPRING_DATASOURCE_USERNAME=user_service
+      - SPRING_DATASOURCE_PASSWORD=user_pass123
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=admin
+      - SPRING_RABBITMQ_PASSWORD=admin123
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  product-service:
+    build:
+      context: ./services/product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres-products
+      - rabbitmq
+      - eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-products:5432/product_db
+      - SPRING_DATASOURCE_USERNAME=product_service
+      - SPRING_DATASOURCE_PASSWORD=product_pass123
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  order-service:
+    build:
+      context: ./services/order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres-orders
+      - rabbitmq
+      - eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-orders:5432/order_db
+      - SPRING_DATASOURCE_USERNAME=order_service
+      - SPRING_DATASOURCE_PASSWORD=order_pass123
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  inventory-service:
+    build:
+      context: ./services/inventory-service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres-inventory
+      - rabbitmq
+      - redis
+      - eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-inventory:5432/inventory_db
+      - SPRING_DATASOURCE_USERNAME=inventory_service
+      - SPRING_DATASOURCE_PASSWORD=inventory_pass123
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_REDIS_HOST=redis
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  shipping-service:
+    build:
+      context: ./services/shipping-service
+      dockerfile: Dockerfile
+    container_name: shipping-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - postgres-shipping
+      - rabbitmq
+      - redis
+      - eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-shipping:5432/shipping_db
+      - SPRING_DATASOURCE_USERNAME=shipping_service
+      - SPRING_DATASOURCE_PASSWORD=shipping_pass123
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_REDIS_HOST=redis
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+  payment-service:
+    build:
+      context: ./services/payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      - postgres-payments
+      - rabbitmq
+      - eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-payments:5432/payment_db
+      - SPRING_DATASOURCE_USERNAME=payment_service
+      - SPRING_DATASOURCE_PASSWORD=payment_pass123
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+
+networks:
+  dryfruits-network:
+    driver: bridge
+
+volumes:
+  postgres_users_data:
+  postgres_products_data:
+  postgres_inventory_data:
+  postgres_shipping_data:
+  postgres_orders_data:
+  postgres_payments_data:

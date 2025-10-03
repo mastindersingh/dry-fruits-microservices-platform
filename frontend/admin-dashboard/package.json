@@ -1,0 +1,17 @@
+{
+  "name": "dryfruits-admin-dashboard",
+  "version": "1.0.0",
+  "description": "Admin dashboard for internal team management of dry fruits platform",
+  "main": "index.js",
+  "scripts": {
+    "start": "http-server . -p 3001 -c-1 -a 0.0.0.0",
+    "dev": "http-server . -p 3001 -c-1 -a 0.0.0.0"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "devDependencies": {},
+  "keywords": ["admin", "dashboard", "dry-fruits", "management"],
+  "author": "Dry Fruits Platform",
+  "license": "MIT"
+}

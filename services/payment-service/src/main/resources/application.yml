@@ -1,0 +1,69 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: payment-service
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://postgres-payments:5432/payment_db
+    username: payment_service
+    password: payment_pass123
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: payment-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+# Service Discovery
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Payment Gateway Configuration
+payment:
+  gateway:
+    stripe:
+      secret-key: ${STRIPE_SECRET_KEY:sk_test_dummy}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_dummy}
+    razorpay:
+      key-id: ${RAZORPAY_KEY_ID:rzp_test_dummy}
+      key-secret: ${RAZORPAY_KEY_SECRET:dummy_secret}
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    com.dryfruits.platform.paymentservice: INFO
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

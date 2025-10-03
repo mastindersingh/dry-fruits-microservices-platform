@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Dry Fruits Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 0.5rem;
+        }
+        
+        .status-online { background: #2ecc71; }
+        .status-offline { background: #e74c3c; }
+        
+        .actions-panel {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .links-panel {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .monitoring-link {
+            display: block;
+            padding: 1rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.3s;
+        }
+        
+        .monitoring-link:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .monitoring-link h4 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        @media (max-width: 768px) {
+            .metrics-grid,
+            .actions-grid,
+            .link-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🥜 Admin Dashboard</h1>
+        <div class="user-info">
+            <span>Welcome, <strong id="username"></strong></span>
+            <a href="index.html" style="color: white; text-decoration: none; margin-right: 1rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 5px;">🛠️ Full Admin</a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value" id="totalUsers">156</div>
+                <div class="metric-label">Total Users</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-value" id="activeOrders">23</div>
+                <div class="metric-label">Active Orders</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-value" id="inventoryItems">847</div>
+                <div class="metric-label">Inventory Items</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-value">
+                    Services
+                    <span class="status-indicator status-online" title="All services online"></span>
+                </div>
+                <div class="metric-label">System Status</div>
+            </div>
+        </div>
+        
+        <div class="actions-panel">
+            <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+            <div class="actions-grid">
+                <button class="action-btn" onclick="generateLoad()">🚀 Generate Load Test</button>
+                <button class="action-btn" onclick="refreshMetrics()">📊 Refresh Metrics</button>
+                <button class="action-btn" onclick="exportData()">📥 Export Data</button>
+                <button class="action-btn" onclick="viewLogs()">📋 View System Logs</button>
+            </div>
+        </div>
+        
+        <div class="links-panel">
+            <h3 style="margin-bottom: 1rem;">Monitoring & Observability</h3>
+            <div class="link-grid">
+                <a href="http://localhost:3000" target="_blank" class="monitoring-link">
+                    <h4>📊 Grafana Dashboard</h4>
+                    <p>View metrics, alerts, and system performance</p>
+                </a>
+                
+                <a href="http://localhost:9091" target="_blank" class="monitoring-link">
+                    <h4>📈 Prometheus Metrics</h4>
+                    <p>Raw metrics and query interface</p>
+                </a>
+                
+                <a href="http://localhost:16686" target="_blank" class="monitoring-link">
+                    <h4>🔍 Jaeger Tracing</h4>
+                    <p>Distributed request tracing</p>
+                </a>
+                
+                <a href="http://localhost:8762" target="_blank" class="monitoring-link">
+                    <h4>🎯 Eureka Registry</h4>
+                    <p>Service discovery and registration</p>
+                </a>
+                
+                <a href="http://localhost:30900" target="_blank" class="monitoring-link">
+                    <h4>🛒 Customer Portal</h4>
+                    <p>Customer-facing application</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const adminUser = localStorage.getItem('adminUser');
+        if (!adminUser) {
+            window.location.href = 'login.html';
+        }
+        
+        // Display username
+        document.getElementById('username').textContent = adminUser;
+        
+        // Simulate real-time metrics updates
+        function updateMetrics() {
+            const totalUsers = document.getElementById('totalUsers');
+            const activeOrders = document.getElementById('activeOrders');
+            const inventoryItems = document.getElementById('inventoryItems');
+            
+            // Simulate changing values
+            totalUsers.textContent = 150 + Math.floor(Math.random() * 20);
+            activeOrders.textContent = 20 + Math.floor(Math.random() * 10);
+            inventoryItems.textContent = 840 + Math.floor(Math.random() * 20);
+        }
+        
+        // Update metrics every 5 seconds
+        setInterval(updateMetrics, 5000);
+        
+        // Action handlers
+        function generateLoad() {
+            alert('🚀 Load test initiated! Check Grafana dashboard for real-time metrics.');
+            
+            // Simulate API calls
+            const endpoints = [
+                'http://localhost:8084/actuator/health',
+                'http://localhost:8085/actuator/health',
+                'http://localhost:30900'
+            ];
+            
+            endpoints.forEach(endpoint => {
+                fetch(endpoint).catch(() => {}); // Silent fail for demo
+            });
+        }
+        
+        function refreshMetrics() {
+            updateMetrics();
+            alert('📊 Metrics refreshed successfully!');
+        }
+        
+        function exportData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                user: adminUser,
+                metrics: {
+                    totalUsers: document.getElementById('totalUsers').textContent,
+                    activeOrders: document.getElementById('activeOrders').textContent,
+                    inventoryItems: document.getElementById('inventoryItems').textContent
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `admin-export-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function viewLogs() {
+            window.open('http://localhost:3000/d/logs', '_blank');
+        }
+        
+        function logout() {
+            localStorage.removeItem('adminUser');
+            localStorage.removeItem('loginTime');
+            window.location.href = 'login.html';
+        }
+        
+        // Initial metrics update
+        updateMetrics();
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "dryfruits-customer-portal",
+  "version": "1.0.0",
+  "description": "Customer-facing e-commerce portal for dry fruits platform",
+  "main": "index.js",
+  "scripts": {
+    "start": "http-server . -p 3000 -c-1",
+    "dev": "http-server . -p 3000 -c-1"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "devDependencies": {},
+  "keywords": ["ecommerce", "dry-fruits", "customer-portal"],
+  "author": "Dry Fruits Platform",
+  "license": "MIT"
+}

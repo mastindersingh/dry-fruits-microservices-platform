@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  customer-portal:
+    build:
+      context: ./frontend/customer-portal
+      dockerfile: Dockerfile
+    container_name: customer-portal
+    ports:
+      - "3000:3000"
+    networks:
+      - dryfruits-net
+    environment:
+      - NODE_ENV=production
+      - API_BASE_URL=http://localhost:8084
+
+  admin-dashboard:
+    build:
+      context: ./frontend/admin-dashboard
+      dockerfile: Dockerfile
+    container_name: admin-dashboard
+    ports:
+      - "3001:3000"
+    networks:
+      - dryfruits-net
+    environment:
+      - NODE_ENV=production
+      - API_BASE_URL=http://localhost:8084
+
+networks:
+  dryfruits-net:
+    external: true
+    name: dry-fruits-microservices-complete_dryfruits-network

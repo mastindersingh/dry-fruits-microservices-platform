@@ -1,0 +1,182 @@
+services:
+  # Single shared database (saves memory)
+  postgres-shared:
+    image: postgres:15-alpine
+    container_name: postgres-shared
+    environment:
+      POSTGRES_DB: dryfruits_db
+      POSTGRES_USER: dryfruits_user
+      POSTGRES_PASSWORD: dryfruits_pass123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_shared_data:/var/lib/postgresql/data
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Lightweight cache
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+  # Message queue
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # Service discovery
+  eureka-server:
+    build:
+      context: ./services/eureka-server
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+    environment:
+      - JAVA_OPTS=-Xms128m -Xmx256m
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Core business services
+  inventory-service:
+    build:
+      context: ./services/inventory-service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres-shared
+      - rabbitmq
+      - redis
+      - eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-shared:5432/dryfruits_db
+      - SPRING_DATASOURCE_USERNAME=dryfruits_user
+      - SPRING_DATASOURCE_PASSWORD=dryfruits_pass123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_REDIS_HOST=redis
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 512M
+
+  shipping-service:
+    build:
+      context: ./services/shipping-service
+      dockerfile: Dockerfile
+    container_name: shipping-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - postgres-shared
+      - rabbitmq
+      - redis
+      - eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-shared:5432/dryfruits_db
+      - SPRING_DATASOURCE_USERNAME=dryfruits_user
+      - SPRING_DATASOURCE_PASSWORD=dryfruits_pass123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_REDIS_HOST=redis
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 512M
+
+  # Frontend Services
+  customer-portal:
+    build:
+      context: ./frontend/customer-portal
+      dockerfile: Dockerfile
+    container_name: customer-portal
+    ports:
+      - "3000:3000"
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - API_BASE_URL=http://localhost:8080
+    depends_on:
+      - inventory-service
+      - shipping-service
+
+  admin-dashboard:
+    build:
+      context: ./frontend/admin-dashboard
+      dockerfile: Dockerfile
+    container_name: admin-dashboard
+    ports:
+      - "3001:3001"
+    networks:
+      - dryfruits-network
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - API_BASE_URL=http://localhost:8080
+    depends_on:
+      - inventory-service
+      - shipping-service
+      - eureka-server
+
+networks:
+  dryfruits-network:
+    driver: bridge
+
+volumes:
+  postgres_shared_data:
