@@ -1,20 +1,16 @@
-FROM eclipse-temurin:17-jdk
+FROM maven:3.9-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-# Copy Maven files for dependency caching
+# Copy pom and download dependencies
 COPY pom.xml .
-COPY mvnw .
-COPY .mvn .mvn
-
-# Download dependencies
-RUN ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B || true
 
 # Copy source code
 COPY src ./src
 
 # Build application
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Create runtime image
 FROM eclipse-temurin:17-jre
