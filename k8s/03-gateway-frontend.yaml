@@ -195,3 +195,22 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
+
+---
+# OpenShift Route for Payment Service
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: payment-service-route
+  namespace: dry-fruits-platform
+  labels:
+    app: payment-service
+spec:
+  to:
+    kind: Service
+    name: payment-service
+  port:
+    targetPort: 8084
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

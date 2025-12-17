@@ -6,7 +6,8 @@ const API_CONFIG = {
     INVENTORY_SERVICE: 'https://inventory-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com',
     SHIPPING_SERVICE: 'https://shipping-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com',
     ORDER_SERVICE: 'https://order-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com',
-    USER_SERVICE: 'https://user-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com'
+    USER_SERVICE: 'https://user-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com',
+    PAYMENT_SERVICE: 'https://payment-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com'
 };
 
 // Application State
@@ -596,36 +597,84 @@ async function checkout() {
         return;
     }
 
-    try {
-        showLoadingOverlay('Processing your order...');
-        
-        // Simulate order creation
-        const orderData = {
-            items: cart,
-            subtotal: cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0),
-            shipping: cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0) > 50 ? 0 : 5.99,
-            total: cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0) + 
-                   (cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0) > 50 ? 0 : 5.99)
-        };
+    if (!currentUser) {
+        showNotification('Please login to proceed with checkout', 'error');
+        showLoginModal(new Event('click'));
+        return;
+    }
 
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
+    // Show payment modal
+    const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+    paymentModal.show();
+}
+
+async function processPayment(e) {
+    e.preventDefault();
+    
+    const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+    const cardName = document.getElementById('cardName').value;
+    const expiryDate = document.getElementById('expiryDate').value;
+    const cvv = document.getElementById('cvv').value;
+    
+    // Parse expiry date
+    const [month, year] = expiryDate.split('/');
+    const fullYear = '20' + year;
+    
+    // Calculate total
+    const subtotal = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+    const shipping = subtotal > 50 ? 0 : 5.99;
+    const total = subtotal + shipping;
+    
+    try {
+        showLoadingOverlay('Processing payment...');
         
-        // Clear cart and show success
-        cart = [];
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartCount();
+        const paymentData = {
+            orderId: Date.now(), // Temporary order ID
+            userId: currentUser.userId,
+            amount: total,
+            currency: 'USD',
+            paymentMethod: 'CREDIT_CARD',
+            cardNumber: cardNumber,
+            cardHolderName: cardName,
+            expiryMonth: month.padStart(2, '0'),
+            expiryYear: fullYear,
+            cvv: cvv
+        };
         
-        hideLoadingOverlay();
-        showNotification('Order placed successfully! Check your orders for tracking info.', 'success');
+        const response = await fetch(`${API_CONFIG.PAYMENT_SERVICE}/api/v1/payments/process`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeaders()
+            },
+            body: JSON.stringify(paymentData)
+        });
         
-        // Redirect to orders
-        showSection('orders');
+        const result = await response.json();
+        
+        if (response.ok && result.status === 'COMPLETED') {
+            // Payment successful - clear cart
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            
+            // Hide payment modal
+            bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+            
+            hideLoadingOverlay();
+            showNotification(`Payment successful! Transaction ID: ${result.transactionId}`, 'success');
+            
+            // Redirect to orders
+            showSection('orders');
+        } else {
+            hideLoadingOverlay();
+            showNotification(result.failureReason || 'Payment failed. Please try again.', 'error');
+        }
         
     } catch (error) {
         hideLoadingOverlay();
-        console.error('Checkout error:', error);
-        showNotification('Unable to process order. Please try again.', 'error');
+        console.error('Payment error:', error);
+        showNotification('Unable to process payment. Please try again.', 'error');
     }
 }
 
