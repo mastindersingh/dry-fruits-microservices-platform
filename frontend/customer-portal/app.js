@@ -1,31 +1,214 @@
 // Customer Portal JavaScript - Main Application Logic
 
-// API Configuration
+// API Configuration - Updated for OpenShift
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:8080', // API Gateway
-    INVENTORY_SERVICE: 'http://localhost:8084',
-    SHIPPING_SERVICE: 'http://localhost:8085',
-    ORDER_SERVICE: 'http://localhost:8083',
-    USER_SERVICE: 'http://localhost:8081'
+    BASE_URL: 'http://api-gateway-service.dry-fruits-platform.svc.cluster.local:8080', // API Gateway
+    INVENTORY_SERVICE: 'http://inventory-service.dry-fruits-platform.svc.cluster.local:8084',
+    SHIPPING_SERVICE: 'http://shipping-service.dry-fruits-platform.svc.cluster.local:8085',
+    ORDER_SERVICE: 'http://order-service.dry-fruits-platform.svc.cluster.local:8083',
+    USER_SERVICE: 'http://user-service.dry-fruits-platform.svc.cluster.local:8081'
 };
 
 // Application State
-let currentUser = null;
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+let authToken = localStorage.getItem('authToken') || null;
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let products = [];
 let orders = [];
+
+// ========================================
+// AUTHENTICATION FUNCTIONS
+// ========================================
+
+function showLoginModal(e) {
+    e.preventDefault();
+    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+    loginModal.show();
+}
+
+function switchToRegister() {
+    bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+    const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+    registerModal.show();
+}
+
+function switchToLogin() {
+    bootstrap.Modal.getInstance(document.getElementById('registerModal')).hide();
+    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+    loginModal.show();
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorDiv = document.getElementById('loginError');
+    
+    try {
+        const response = await fetch(`${API_CONFIG.USER_SERVICE}/api/v1/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Login failed');
+        }
+        
+        // Save user data and token
+        currentUser = {
+            id: data.userId,
+            email: data.email,
+            name: data.name,
+            role: data.role
+        };
+        authToken = data.token;
+        
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        localStorage.setItem('authToken', authToken);
+        
+        // Hide modal and update UI
+        bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+        updateAuthUI();
+        showNotification(`Welcome back, ${currentUser.name}!`, 'success');
+        
+        // Reset form
+        document.getElementById('loginForm').reset();
+        errorDiv.classList.add('d-none');
+        
+    } catch (error) {
+        errorDiv.textContent = error.message;
+        errorDiv.classList.remove('d-none');
+    }
+}
+
+async function handleRegister(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+    const errorDiv = document.getElementById('registerError');
+    
+    // Validate password match
+    if (password !== passwordConfirm) {
+        errorDiv.textContent = 'Passwords do not match';
+        errorDiv.classList.remove('d-none');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_CONFIG.USER_SERVICE}/api/v1/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Registration failed');
+        }
+        
+        // Save user data and token
+        currentUser = {
+            id: data.userId,
+            email: data.email,
+            name: data.name,
+            role: data.role
+        };
+        authToken = data.token;
+        
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        localStorage.setItem('authToken', authToken);
+        
+        // Hide modal and update UI
+        bootstrap.Modal.getInstance(document.getElementById('registerModal')).hide();
+        updateAuthUI();
+        showNotification(`Welcome, ${currentUser.name}! Your account has been created.`, 'success');
+        
+        // Reset form
+        document.getElementById('registerForm').reset();
+        errorDiv.classList.add('d-none');
+        
+    } catch (error) {
+        errorDiv.textContent = error.message;
+        errorDiv.classList.remove('d-none');
+    }
+}
+
+function logout() {
+    currentUser = null;
+    authToken = null;
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
+    updateAuthUI();
+    showNotification('Logged out successfully', 'info');
+}
+
+function updateAuthUI() {
+    const authNav = document.getElementById('auth-nav');
+    
+    if (currentUser) {
+        authNav.innerHTML = `
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user-circle"></i> ${currentUser.name}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#profile"><i class="fas fa-user"></i> Profile</a></li>
+                    <li><a class="dropdown-item" href="#orders"><i class="fas fa-box"></i> My Orders</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </div>
+        `;
+    } else {
+        authNav.innerHTML = `
+            <a class="nav-link" href="#" onclick="showLoginModal(event)">
+                <i class="fas fa-user"></i> Login
+            </a>
+        `;
+    }
+}
+
+// Helper function to add auth header to requests
+function getAuthHeaders() {
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    
+    if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+    }
+    
+    return headers;
+}
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
     setupEventListeners();
+    updateAuthUI();  // Update auth UI on page load
     loadProducts();
     updateCartCount();
 });
 
 function initializeApp() {
     console.log('🚀 Customer Portal Initialized');
-    showNotification('Welcome to Premium Dry Fruits!', 'success');
+    if (currentUser) {
+        showNotification(`Welcome back, ${currentUser.name}!`, 'success');
+    } else {
+        showNotification('Welcome to Premium Dry Fruits!', 'success');
+    }
 }
 
 function setupEventListeners() {

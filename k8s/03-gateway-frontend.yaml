@@ -157,3 +157,22 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
+
+---
+# OpenShift Route for Admin Dashboard
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: admin-dashboard-route
+  namespace: dry-fruits-platform
+  labels:
+    app: admin-dashboard
+spec:
+  to:
+    kind: Service
+    name: admin-dashboard
+  port:
+    targetPort: 3001
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

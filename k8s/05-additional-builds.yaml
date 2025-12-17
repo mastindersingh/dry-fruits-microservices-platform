@@ -1,0 +1,94 @@
+# Additional Build Configurations for Inventory, Shipping, and Payment Services
+
+---
+# Inventory Service Build
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: inventory-service-build
+  namespace: dry-fruits-platform
+  labels:
+    app: inventory-service
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/mastindersingh/dry-fruits-microservices-platform.git
+    contextDir: services/inventory-service
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: inventory-service:latest
+
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: inventory-service
+  namespace: dry-fruits-platform
+
+---
+# Shipping Service Build
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: shipping-service-build
+  namespace: dry-fruits-platform
+  labels:
+    app: shipping-service
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/mastindersingh/dry-fruits-microservices-platform.git
+    contextDir: services/shipping-service
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: shipping-service:latest
+
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: shipping-service
+  namespace: dry-fruits-platform
+
+---
+# Payment Service Build
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: payment-service-build
+  namespace: dry-fruits-platform
+  labels:
+    app: payment-service
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/mastindersingh/dry-fruits-microservices-platform.git
+    contextDir: services/payment-service
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: payment-service:latest
+
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: payment-service
+  namespace: dry-fruits-platform

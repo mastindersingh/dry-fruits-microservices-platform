@@ -63,7 +63,7 @@ spec:
     spec:
       containers:
       - name: admin-dashboard
-        image: dryfruits/admin-dashboard:latest
+        image: image-registry.openshift-image-registry.svc:5000/dry-fruits-platform/admin-dashboard:latest
         ports:
         - containerPort: 3001
         imagePullPolicy: IfNotPresent
