@@ -1,0 +1,188 @@
+# Container Build Configuration for OpenShift
+# This creates BuildConfigs that will build your images directly in OpenShift
+
+---
+# Eureka Server Build
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: eureka-server-build
+  namespace: dry-fruits-platform
+  labels:
+    app: eureka-server
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/mastindersingh/dry-fruits-microservices-platform.git
+    contextDir: services/eureka-server
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: eureka-server:latest
+
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: eureka-server
+  namespace: dry-fruits-platform
+
+---
+# User Service Build
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: user-service-build
+  namespace: dry-fruits-platform
+  labels:
+    app: user-service
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/mastindersingh/dry-fruits-microservices-platform.git
+    contextDir: services/user-service
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: user-service:latest
+
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: user-service
+  namespace: dry-fruits-platform
+
+---
+# Product Service Build
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: product-service-build
+  namespace: dry-fruits-platform
+  labels:
+    app: product-service
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/mastindersingh/dry-fruits-microservices-platform.git
+    contextDir: services/product-service
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: product-service:latest
+
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: product-service
+  namespace: dry-fruits-platform
+
+---
+# Order Service Build
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: order-service-build
+  namespace: dry-fruits-platform
+  labels:
+    app: order-service
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/mastindersingh/dry-fruits-microservices-platform.git
+    contextDir: services/order-service
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: order-service:latest
+
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: order-service
+  namespace: dry-fruits-platform
+
+---
+# API Gateway Build
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: api-gateway-build
+  namespace: dry-fruits-platform
+  labels:
+    app: api-gateway
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/mastindersingh/dry-fruits-microservices-platform.git
+    contextDir: services/api-gateway
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: api-gateway:latest
+
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: api-gateway
+  namespace: dry-fruits-platform
+
+---
+# Customer Portal Build
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: customer-portal-build
+  namespace: dry-fruits-platform
+  labels:
+    app: customer-portal
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/mastindersingh/dry-fruits-microservices-platform.git
+    contextDir: frontend/customer-portal
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: customer-portal:latest
+
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: customer-portal
+  namespace: dry-fruits-platform

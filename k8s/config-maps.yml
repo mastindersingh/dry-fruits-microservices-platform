@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: inventory-service-config
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 data:
   application.yml: |
     server:
@@ -101,7 +101,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: shipping-service-config
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 data:
   application.yml: |
     server:

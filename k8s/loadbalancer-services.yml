@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus-lb
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: prometheus
@@ -15,7 +15,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: jaeger-lb
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: jaeger
@@ -28,7 +28,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: eureka-lb
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: eureka-server
@@ -41,7 +41,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: inventory-lb
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: inventory-service
@@ -54,7 +54,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: shipping-lb
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: shipping-service

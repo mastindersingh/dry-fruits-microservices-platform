@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dry-fruits-platform
+  labels:
+    name: dry-fruits-platform
+---
+# ConfigMap for shared configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-config
+  namespace: dry-fruits-platform
+data:
+  # Database Configuration
+  POSTGRES_DB: "dry_fruits_db"
+  POSTGRES_USER: "dry_fruits_user"
+  
+  # Redis Configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  
+  # Eureka Configuration
+  EUREKA_SERVER_URL: "http://eureka-service:8761/eureka"
+  
+  # Application Configuration
+  SPRING_PROFILES_ACTIVE: "openshift"
+  LOGGING_LEVEL_ROOT: "INFO"
+  
+  # JWT Configuration (non-sensitive part)
+  JWT_EXPIRATION: "86400000"
+---
+# Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: platform-secrets
+  namespace: dry-fruits-platform
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "dry_fruits_pass123"
+  REDIS_PASSWORD: "redis_pass123"
+  JWT_SECRET: "dryFruitsSecretKey2024ForJWTTokenGeneration"

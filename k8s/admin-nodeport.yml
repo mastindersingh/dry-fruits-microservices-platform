@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: admin-dashboard-nodeport
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: admin-dashboard

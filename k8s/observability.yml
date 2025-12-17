@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-datasources
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 data:
   prometheus.yml: |
     apiVersion: 1
@@ -17,7 +17,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-dashboards
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 data:
   dashboard.json: |
     {
@@ -222,7 +222,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-dashboards-provider
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 data:
   dashboards.yml: |
     apiVersion: 1
@@ -241,7 +241,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: prometheus
@@ -254,7 +254,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   replicas: 1
   selector:
@@ -270,20 +270,38 @@ spec:
         image: prom/prometheus:latest
         ports:
         - containerPort: 9090
+        args:
+          - '--config.file=/etc/prometheus/prometheus.yml'
+          - '--storage.tsdb.path=/prometheus'
+          - '--storage.tsdb.retention.time=15d'
+          - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+          - '--web.console.templates=/usr/share/prometheus/consoles'
+          - '--web.enable-lifecycle'
         volumeMounts:
         - name: config
           mountPath: /etc/prometheus
+        - name: prometheus-storage
+          mountPath: /prometheus
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
       volumes:
       - name: config
         configMap:
           name: prometheus-config
+      - name: prometheus-storage
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: grafana
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: grafana
@@ -296,7 +314,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   replicas: 1
   selector:
@@ -342,7 +360,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: jaeger
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: jaeger
@@ -355,7 +373,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jaeger
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   replicas: 1
   selector:
@@ -380,7 +398,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-config
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 data:
   prometheus.yml: |
     global:

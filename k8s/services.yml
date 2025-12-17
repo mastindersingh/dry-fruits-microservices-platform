@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: eureka-server
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: eureka-server
@@ -15,7 +15,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: eureka-server
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   replicas: 1
   selector:
@@ -44,7 +44,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: inventory-service
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: inventory-service
@@ -57,7 +57,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: inventory-service
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   replicas: 1
   selector:
@@ -90,7 +90,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: shipping-service
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   selector:
     app: shipping-service
@@ -103,7 +103,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: shipping-service
-  namespace: dryfruit
+  namespace: dry-fruits-platform
 spec:
   replicas: 1
   selector:

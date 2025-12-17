@@ -1,0 +1,159 @@
+# ==================================================
+# API GATEWAY & EXTERNAL ACCESS
+# ==================================================
+
+# API Gateway - Single Entry Point
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: dry-fruits-platform
+  labels:
+    app: api-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+      - name: api-gateway
+        image: image-registry.openshift-image-registry.svc:5000/dry-fruits-platform/api-gateway:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: SPRING_PROFILES_ACTIVE
+        - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: EUREKA_SERVER_URL
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 90
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-service
+  namespace: dry-fruits-platform
+spec:
+  selector:
+    app: api-gateway
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP
+
+---
+# OpenShift Route for external access
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: api-gateway-route
+  namespace: dry-fruits-platform
+  labels:
+    app: api-gateway
+spec:
+  to:
+    kind: Service
+    name: api-gateway-service
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+# Frontend - Customer Portal
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-portal
+  namespace: dry-fruits-platform
+  labels:
+    app: customer-portal
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: customer-portal
+  template:
+    metadata:
+      labels:
+        app: customer-portal
+    spec:
+      containers:
+      - name: customer-portal
+        image: image-registry.openshift-image-registry.svc:5000/dry-fruits-platform/customer-portal:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: API_GATEWAY_URL
+          value: "https://api-gateway-route-dry-fruits-platform.apps.your-cluster.com"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: customer-portal-service
+  namespace: dry-fruits-platform
+spec:
+  selector:
+    app: customer-portal
+  ports:
+  - port: 3000
+    targetPort: 3000
+  type: ClusterIP
+
+---
+# OpenShift Route for Customer Portal
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: customer-portal-route
+  namespace: dry-fruits-platform
+  labels:
+    app: customer-portal
+spec:
+  to:
+    kind: Service
+    name: customer-portal-service
+  port:
+    targetPort: 3000
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
