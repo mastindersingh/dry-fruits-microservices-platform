@@ -176,3 +176,22 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
+
+---
+# OpenShift Route for User Service
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: user-service-route
+  namespace: dry-fruits-platform
+  labels:
+    app: user-service
+spec:
+  to:
+    kind: Service
+    name: user-service
+  port:
+    targetPort: 8081
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

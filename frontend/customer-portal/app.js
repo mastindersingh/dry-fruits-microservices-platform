@@ -1,12 +1,12 @@
 // Customer Portal JavaScript - Main Application Logic
 
-// API Configuration - Updated for OpenShift
+// API Configuration - External Routes for Browser Access
 const API_CONFIG = {
-    BASE_URL: 'http://api-gateway-service.dry-fruits-platform.svc.cluster.local:8080', // API Gateway
-    INVENTORY_SERVICE: 'http://inventory-service.dry-fruits-platform.svc.cluster.local:8084',
-    SHIPPING_SERVICE: 'http://shipping-service.dry-fruits-platform.svc.cluster.local:8085',
-    ORDER_SERVICE: 'http://order-service.dry-fruits-platform.svc.cluster.local:8083',
-    USER_SERVICE: 'http://user-service.dry-fruits-platform.svc.cluster.local:8081'
+    BASE_URL: 'https://api-gateway-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com', // API Gateway
+    INVENTORY_SERVICE: 'https://inventory-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com',
+    SHIPPING_SERVICE: 'https://shipping-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com',
+    ORDER_SERVICE: 'https://order-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com',
+    USER_SERVICE: 'https://user-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com'
 };
 
 // Application State
