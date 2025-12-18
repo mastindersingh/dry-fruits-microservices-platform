@@ -169,15 +169,9 @@ spec:
         - containerPort: 8084
         env:
         - name: SPRING_PROFILES_ACTIVE
-          valueFrom:
-            configMapKeyRef:
-              name: platform-config
-              key: SPRING_PROFILES_ACTIVE
+          value: "docker"
         - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-          valueFrom:
-            configMapKeyRef:
-              name: platform-config
-              key: EUREKA_SERVER_URL
+          value: "http://eureka-server:8761/eureka/"
         resources:
           requests:
             memory: "512Mi"

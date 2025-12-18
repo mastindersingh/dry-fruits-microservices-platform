@@ -7,9 +7,9 @@ spring:
   
   # Database Configuration
   datasource:
-    url: jdbc:postgresql://postgres-payments:5432/payment_db
-    username: payment_service
-    password: payment_pass123
+    url: jdbc:postgresql://postgres:5432/postgres
+    username: admin
+    password: admin123
     driver-class-name: org.postgresql.Driver
   
   jpa:
