@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/payments")
 @CrossOrigin(origins = "*")
 public class PaymentController {
     
@@ -22,9 +21,22 @@ public class PaymentController {
     private PaymentService paymentService;
     
     /**
+     * Root endpoint
+     */
+    @GetMapping("/")
+    public ResponseEntity<Map<String, String>> root() {
+        Map<String, String> response = new HashMap<>();
+        response.put("service", "Payment Service");
+        response.put("version", "1.0.0");
+        response.put("status", "UP");
+        response.put("description", "Mock Payment Gateway API");
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
      * Process a payment
      */
-    @PostMapping("/process")
+    @PostMapping("/api/v1/payments/process")
     public ResponseEntity<?> processPayment(@Valid @RequestBody PaymentRequest request) {
         try {
             PaymentResponse response = paymentService.processPayment(request);
@@ -45,7 +57,7 @@ public class PaymentController {
     /**
      * Get payment by ID
      */
-    @GetMapping("/{id}")
+    @GetMapping("/api/v1/payments/{id}")
     public ResponseEntity<?> getPayment(@PathVariable Long id) {
         try {
             Payment payment = paymentService.getPaymentById(id);
@@ -61,7 +73,7 @@ public class PaymentController {
     /**
      * Get payment by order ID
      */
-    @GetMapping("/order/{orderId}")
+    @GetMapping("/api/v1/payments/order/{orderId}")
     public ResponseEntity<?> getPaymentByOrder(@PathVariable Long orderId) {
         try {
             Payment payment = paymentService.getPaymentByOrderId(orderId);
@@ -77,7 +89,7 @@ public class PaymentController {
     /**
      * Health check endpoint
      */
-    @GetMapping("/health")
+    @GetMapping("/api/v1/payments/health")
     public ResponseEntity<Map<String, String>> health() {
         Map<String, String> response = new HashMap<>();
         response.put("status", "UP");
@@ -88,7 +100,7 @@ public class PaymentController {
     /**
      * Get test card numbers
      */
-    @GetMapping("/test-cards")
+    @GetMapping("/api/v1/payments/test-cards")
     public ResponseEntity<Map<String, Object>> getTestCards() {
         Map<String, Object> testCards = new HashMap<>();
         testCards.put("success_cards", new String[]{
