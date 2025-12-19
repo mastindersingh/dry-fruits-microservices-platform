@@ -1,0 +1,50 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: grafana-route
+  namespace: dry-fruits-platform
+  labels:
+    app: grafana
+spec:
+  to:
+    kind: Service
+    name: grafana
+  port:
+    targetPort: 3000
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: prometheus-route
+  namespace: dry-fruits-platform
+  labels:
+    app: prometheus
+spec:
+  to:
+    kind: Service
+    name: prometheus
+  port:
+    targetPort: 9090
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: jaeger-route
+  namespace: dry-fruits-platform
+  labels:
+    app: jaeger
+spec:
+  to:
+    kind: Service
+    name: jaeger
+  port:
+    targetPort: 16686
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
