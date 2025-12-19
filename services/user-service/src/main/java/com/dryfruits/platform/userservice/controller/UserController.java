@@ -8,10 +8,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/users")
 public class UserController {
 
-    @GetMapping("/health")
+    @GetMapping("/")
+    public Map<String, Object> root() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("service", "User Service");
+        response.put("description", "Dry Fruits Platform - User Management & Authentication API");
+        response.put("version", "1.0.0");
+        response.put("status", "UP");
+        response.put("endpoints", new String[]{
+            "/api/v1/auth/register - Register new user",
+            "/api/v1/auth/login - User login",
+            "/api/v1/users/health - Health check",
+            "/api/v1/users/info - Service information",
+            "/actuator/health - Actuator health"
+        });
+        return response;
+    }
+
+    @GetMapping("/api/v1/users/health")
     public Map<String, Object> health() {
         Map<String, Object> response = new HashMap<>();
         response.put("service", "user-service");
@@ -21,7 +37,7 @@ public class UserController {
         return response;
     }
 
-    @GetMapping("/info")
+    @GetMapping("/api/v1/users/info")
     public Map<String, Object> info() {
         Map<String, Object> response = new HashMap<>();
         response.put("service", "user-service");
