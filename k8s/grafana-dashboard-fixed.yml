@@ -1,0 +1,211 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: dry-fruits-platform
+data:
+  dashboard.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "uid": "dry-fruits-overview",
+        "title": "🥜 Dry Fruits Platform - System Overview",
+        "tags": ["dry-fruits", "microservices", "overview"],
+        "style": "dark",
+        "timezone": "browser",
+        "editable": true,
+        "panels": [
+          {
+            "id": 1,
+            "title": "Service Status - All Services",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up",
+                "legendFormat": "{{job}}",
+                "refId": "A"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "mappings": [
+                  {
+                    "options": {
+                      "0": {
+                        "text": "DOWN",
+                        "color": "red"
+                      },
+                      "1": {
+                        "text": "UP",
+                        "color": "green"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ],
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "steps": [
+                    {"color": "red", "value": 0},
+                    {"color": "green", "value": 1}
+                  ]
+                }
+              }
+            },
+            "options": {
+              "colorMode": "background",
+              "graphMode": "none",
+              "textMode": "value_and_name"
+            },
+            "gridPos": {"h": 6, "w": 24, "x": 0, "y": 0}
+          },
+          {
+            "id": 2,
+            "title": "HTTP Request Rate (requests/sec)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "sum(rate(http_server_requests_seconds_count{job=~\"user-service|payment-service\"}[5m])) by (job)",
+                "legendFormat": "{{job}}",
+                "refId": "A"
+              }
+            ],
+            "yAxes": [
+              {"label": "Requests/sec", "min": 0}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6}
+          },
+          {
+            "id": 3,
+            "title": "HTTP Response Time (95th percentile)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{job=~\"user-service|payment-service\"}[5m])) by (le, job))",
+                "legendFormat": "{{job}}",
+                "refId": "A"
+              }
+            ],
+            "yAxes": [
+              {"label": "Seconds", "min": 0}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6}
+          },
+          {
+            "id": 4,
+            "title": "JVM Memory Usage (Heap)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "jvm_memory_used_bytes{job=~\"user-service|payment-service\", area=\"heap\"}",
+                "legendFormat": "{{job}} - Heap Used",
+                "refId": "A"
+              },
+              {
+                "expr": "jvm_memory_max_bytes{job=~\"user-service|payment-service\", area=\"heap\"}",
+                "legendFormat": "{{job}} - Heap Max",
+                "refId": "B"
+              }
+            ],
+            "yAxes": [
+              {"label": "Bytes", "format": "bytes"}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 14}
+          },
+          {
+            "id": 5,
+            "title": "Database Connection Pool",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "hikaricp_connections_active{job=~\"user-service|payment-service\"}",
+                "legendFormat": "{{job}} - Active",
+                "refId": "A"
+              },
+              {
+                "expr": "hikaricp_connections{job=~\"user-service|payment-service\"}",
+                "legendFormat": "{{job}} - Total",
+                "refId": "B"
+              }
+            ],
+            "yAxes": [
+              {"label": "Connections", "min": 0}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 14}
+          },
+          {
+            "id": 6,
+            "title": "Error Rate (4xx/5xx responses)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "sum(rate(http_server_requests_seconds_count{job=~\"user-service|payment-service\", status=~\"4..|5..\"}[5m])) by (job, status)",
+                "legendFormat": "{{job}} - {{status}}",
+                "refId": "A"
+              }
+            ],
+            "yAxes": [
+              {"label": "Errors/sec", "min": 0}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 22}
+          },
+          {
+            "id": 7,
+            "title": "System CPU Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "system_cpu_usage{job=~\"user-service|payment-service\"}",
+                "legendFormat": "{{job}}",
+                "refId": "A"
+              }
+            ],
+            "yAxes": [
+              {"label": "Percentage", "min": 0, "max": 1}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 22}
+          },
+          {
+            "id": 8,
+            "title": "JVM Threads",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "jvm_threads_live{job=~\"user-service|payment-service\"}",
+                "legendFormat": "{{job}} - Live Threads",
+                "refId": "A"
+              }
+            ],
+            "yAxes": [
+              {"label": "Threads", "min": 0}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 30}
+          },
+          {
+            "id": 9,
+            "title": "Process Uptime",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "process_uptime_seconds{job=~\"user-service|payment-service\"}",
+                "legendFormat": "{{job}}",
+                "refId": "A"
+              }
+            ],
+            "yAxes": [
+              {"label": "Seconds", "format": "s", "min": 0}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 30}
+          }
+        ],
+        "time": {
+          "from": "now-15m",
+          "to": "now"
+        },
+        "timepicker": {},
+        "refresh": "5s",
+        "version": 1
+      }
+    }
