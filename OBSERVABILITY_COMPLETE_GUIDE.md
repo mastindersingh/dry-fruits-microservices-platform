@@ -16,7 +16,7 @@ https://grafana-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com
 
 **Default Credentials:**
 - Username: `admin`
-- Password: `admin` (or check ConfigMap/Secret)
+- Password: `grafana123`
 
 **Features:**
 - ✅ Pre-configured Dry Fruits Platform dashboard
@@ -125,7 +125,7 @@ https://grafana-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com
 
 **Step 3:** Login
 - Username: `admin`
-- Password: `admin`
+- Password: `grafana123`
 
 **Step 4:** View Dashboard
 - Go to "Dashboards" → "Browse"

@@ -12,7 +12,7 @@
 ```
 https://grafana-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com
 ```
-**Login**: admin / admin  
+**Login**: admin / grafana123  
 **Pre-built Dashboard**: "🥜 Dry Fruits Platform - System Overview"
 
 ### Prometheus Metrics
@@ -34,7 +34,7 @@ https://jaeger-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com
 ### Step 1: Open Grafana Dashboard
 1. Visit: https://grafana-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com
 2. Accept SSL certificate (Advanced → Proceed)
-3. Login: admin / admin
+3. Login: admin / grafana123
 4. Go to Dashboards → "🥜 Dry Fruits Platform - System Overview"
 
 **You'll see:**

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🥜 Dry Fruits Platform - Quick Access Links</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .link-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+        }
+        .link-card .title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .link-card .description {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        .link-card .url {
+            font-size: 0.75em;
+            opacity: 0.7;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+        }
+        .observability {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .backend {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .frontend {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        .credentials {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+        }
+        .credentials h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .credentials code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+            color: #856404;
+        }
+        .note strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            .link-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥜 Dry Fruits Platform</h1>
+        <p class="subtitle">Quick Access to All Services & Tools</p>
+
+        <!-- Frontend Applications -->
+        <div class="section">
+            <h2>🌐 Frontend Applications</h2>
+            <div class="link-grid">
+                <a href="https://customer-portal-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/" 
+                   class="link-card frontend" target="_blank">
+                    <div class="title">🛒 Customer Portal</div>
+                    <div class="description">Main shopping interface for customers - Browse products, add to cart, checkout</div>
+                    <div class="url">https://customer-portal-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/</div>
+                </a>
+                
+                <a href="https://admin-dashboard-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/" 
+                   class="link-card frontend" target="_blank">
+                    <div class="title">👨‍💼 Admin Dashboard</div>
+                    <div class="description">Administrative interface for managing products, orders, and users</div>
+                    <div class="url">https://admin-dashboard-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Backend Services -->
+        <div class="section">
+            <h2>⚙️ Backend Services</h2>
+            <div class="link-grid">
+                <a href="https://user-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/" 
+                   class="link-card backend" target="_blank">
+                    <div class="title">👤 User Service</div>
+                    <div class="description">Authentication, registration, user management</div>
+                    <div class="url">https://user-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/</div>
+                </a>
+                
+                <a href="https://user-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/api/v1/users/health" 
+                   class="link-card backend" target="_blank">
+                    <div class="title">💚 User Service Health</div>
+                    <div class="description">Health check endpoint for user service</div>
+                    <div class="url">.../api/v1/users/health</div>
+                </a>
+                
+                <a href="https://payment-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/" 
+                   class="link-card backend" target="_blank">
+                    <div class="title">💳 Payment Service</div>
+                    <div class="description">Payment processing with mock gateway</div>
+                    <div class="url">https://payment-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/</div>
+                </a>
+                
+                <a href="https://payment-service-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/api/v1/payments/health" 
+                   class="link-card backend" target="_blank">
+                    <div class="title">💚 Payment Service Health</div>
+                    <div class="description">Health check endpoint for payment service</div>
+                    <div class="url">.../api/v1/payments/health</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Observability Tools -->
+        <div class="section">
+            <h2>📊 Observability & Monitoring</h2>
+            <div class="link-grid">
+                <a href="https://grafana-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/" 
+                   class="link-card observability" target="_blank">
+                    <div class="title">📈 Grafana</div>
+                    <div class="description">Dashboards, metrics visualization, alerts</div>
+                    <div class="url">https://grafana-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/</div>
+                </a>
+                
+                <a href="https://prometheus-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/" 
+                   class="link-card observability" target="_blank">
+                    <div class="title">🔍 Prometheus</div>
+                    <div class="description">Metrics collection, PromQL queries, service discovery</div>
+                    <div class="url">https://prometheus-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/</div>
+                </a>
+                
+                <a href="https://jaeger-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/" 
+                   class="link-card observability" target="_blank">
+                    <div class="title">🔗 Jaeger</div>
+                    <div class="description">Distributed tracing, request flow analysis</div>
+                    <div class="url">https://jaeger-route-dry-fruits-platform.apps.lab02.ocp4.wfocplab.wwtatc.com/</div>
+                </a>
+            </div>
+
+            <div class="credentials">
+                <h3>🔑 Grafana Credentials</h3>
+                <p>Username: <code>admin</code></p>
+                <p>Password: <code>grafana123</code></p>
+                <p style="margin-top: 10px;"><strong>Pre-built Dashboard:</strong> "🥜 Dry Fruits Platform - System Overview"</p>
+            </div>
+        </div>
+
+        <!-- Test Information -->
+        <div class="section">
+            <h2>🧪 Testing Information</h2>
+            
+            <div class="credentials">
+                <h3>💳 Test Credit Cards (Payment Service)</h3>
+                <p><strong>Success Cards:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 5px;">
+                    <li>Visa: <code>4111111111111111</code></li>
+                    <li>Mastercard: <code>5555555555554444</code></li>
+                    <li>Amex: <code>378282246310005</code></li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>Failure Cards:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 5px;">
+                    <li>Insufficient Funds: <code>4000000000000002</code></li>
+                    <li>Declined: <code>4000000000009995</code></li>
+                </ul>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                    CVV: Any 3 digits | Expiry: Any future date
+                </p>
+            </div>
+
+            <div class="note">
+                <strong>⚠️ SSL Certificate Note:</strong>
+                You may see "Your connection is not private" warnings because the services use self-signed certificates. 
+                Click "Advanced" → "Proceed to [site]" to continue. This is normal for internal OpenShift deployments.
+            </div>
+        </div>
+
+        <!-- OpenShift Console -->
+        <div class="section">
+            <h2>☸️ OpenShift Console</h2>
+            <div class="link-grid">
+                <a href="https://console-openshift-console.apps.lab02.ocp4.wfocplab.wwtatc.com/" 
+                   class="link-card" target="_blank">
+                    <div class="title">🎛️ OpenShift Web Console</div>
+                    <div class="description">Cluster management, pod logs, deployments</div>
+                    <div class="url">https://console-openshift-console.apps.lab02.ocp4.wfocplab.wwtatc.com/</div>
+                </a>
+            </div>
+            
+            <div class="credentials">
+                <h3>🔑 OpenShift Credentials</h3>
+                <p>Username: <code>kubeadmin</code></p>
+                <p>Password: <code>VMAPE-NXSVe-MUb7I-Eghpc</code></p>
+                <p style="margin-top: 10px;"><strong>Project/Namespace:</strong> <code>dry-fruits-platform</code></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
