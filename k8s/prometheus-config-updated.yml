@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: dry-fruits-platform
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    
+    scrape_configs:
+      # User Service
+      - job_name: 'user-service'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['user-service:8081']
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: instance
+          - target_label: service
+            replacement: user-service
+      
+      # Payment Service
+      - job_name: 'payment-service'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['payment-service:8084']
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: instance
+          - target_label: service
+            replacement: payment-service
+      
+      # Customer Portal (if it has metrics)
+      - job_name: 'customer-portal'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['customer-portal:3000']
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: instance
+          - target_label: service
+            replacement: customer-portal
+      
+      # Admin Dashboard (if it has metrics)
+      - job_name: 'admin-dashboard'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['admin-dashboard:3000']
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: instance
+          - target_label: service
+            replacement: admin-dashboard
+      
+      # Eureka Server (if running)
+      - job_name: 'eureka-server'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['eureka-server:8761']
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: instance
+          - target_label: service
+            replacement: eureka-server
+      
+      # PostgreSQL Exporter (if available)
+      - job_name: 'postgres'
+        static_configs:
+          - targets: ['postgres:5432']
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: instance
+          - target_label: service
+            replacement: postgres
+      
+      # Prometheus itself
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
