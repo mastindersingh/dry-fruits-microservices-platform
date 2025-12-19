@@ -270,6 +270,109 @@
         </div>
     </div>
 
+    <!-- Checkout Modal -->
+    <div class="modal fade" id="checkoutModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fas fa-shopping-bag"></i> Checkout</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Order Summary -->
+                    <h6 class="fw-bold mb-3"><i class="fas fa-list"></i> Order Summary</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="checkout-items">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Shipping Address -->
+                    <h6 class="fw-bold mb-3"><i class="fas fa-truck"></i> Shipping Address</h6>
+                    <form id="shippingForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="shippingName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="shippingName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="shippingPhone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="shippingPhone" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="shippingAddress" class="form-label">Street Address</label>
+                            <input type="text" class="form-control" id="shippingAddress" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="shippingCity" class="form-label">City</label>
+                                <input type="text" class="form-control" id="shippingCity" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="shippingState" class="form-label">State</label>
+                                <input type="text" class="form-control" id="shippingState" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="shippingZip" class="form-label">ZIP Code</label>
+                                <input type="text" class="form-control" id="shippingZip" required>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Total Summary -->
+                    <div class="card bg-light mt-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span id="checkout-subtotal">$0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <span id="checkout-shipping">$5.99</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Total:</span>
+                                <span id="checkout-total">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Selection -->
+                    <h6 class="fw-bold mt-4 mb-3"><i class="fas fa-credit-card"></i> Payment Method</h6>
+                    <div class="mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="paymentCard" value="CREDIT_CARD" checked>
+                            <label class="form-check-label" for="paymentCard">
+                                <i class="fas fa-credit-card text-success"></i> Credit/Debit Card
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="paymentCOD" value="CASH_ON_DELIVERY">
+                            <label class="form-check-label" for="paymentCOD">
+                                <i class="fas fa-money-bill-wave text-success"></i> Cash on Delivery
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success btn-lg w-100" onclick="proceedToPayment()">
+                        <i class="fas fa-arrow-right"></i> Proceed to Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Payment Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1">
         <div class="modal-dialog">

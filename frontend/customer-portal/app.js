@@ -603,9 +603,111 @@ async function checkout() {
         return;
     }
 
-    // Show payment modal
+    // Populate checkout modal
+    populateCheckoutModal();
+    
+    // Show checkout modal
+    const checkoutModal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+    checkoutModal.show();
+}
+
+function populateCheckoutModal() {
+    // Populate order items
+    const checkoutItemsBody = document.getElementById('checkout-items');
+    checkoutItemsBody.innerHTML = '';
+    
+    cart.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.productName}</td>
+            <td>${item.quantity}</td>
+            <td>$${item.unitPrice.toFixed(2)}</td>
+            <td>$${(item.unitPrice * item.quantity).toFixed(2)}</td>
+        `;
+        checkoutItemsBody.appendChild(row);
+    });
+    
+    // Calculate and display totals
+    const subtotal = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+    const shipping = subtotal > 50 ? 0 : 5.99;
+    const total = subtotal + shipping;
+    
+    document.getElementById('checkout-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('checkout-shipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
+    document.getElementById('checkout-total').textContent = `$${total.toFixed(2)}`;
+    
+    // Pre-fill user name if available
+    if (currentUser && currentUser.fullName) {
+        document.getElementById('shippingName').value = currentUser.fullName;
+    }
+}
+
+function proceedToPayment() {
+    // Validate shipping form
+    const shippingForm = document.getElementById('shippingForm');
+    if (!shippingForm.checkValidity()) {
+        shippingForm.reportValidity();
+        return;
+    }
+    
+    // Get selected payment method
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    
+    // Store shipping info
+    window.checkoutInfo = {
+        shippingAddress: {
+            name: document.getElementById('shippingName').value,
+            phone: document.getElementById('shippingPhone').value,
+            address: document.getElementById('shippingAddress').value,
+            city: document.getElementById('shippingCity').value,
+            state: document.getElementById('shippingState').value,
+            zip: document.getElementById('shippingZip').value
+        },
+        paymentMethod: paymentMethod
+    };
+    
+    // Hide checkout modal
+    bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide();
+    
+    // If Cash on Delivery, skip payment
+    if (paymentMethod === 'CASH_ON_DELIVERY') {
+        processCashOnDelivery();
+        return;
+    }
+    
+    // Show payment modal for card payment
     const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
     paymentModal.show();
+}
+
+async function processCashOnDelivery() {
+    try {
+        showLoadingOverlay('Processing order...');
+        
+        // Calculate total
+        const subtotal = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+        const shipping = subtotal > 50 ? 0 : 5.99;
+        const total = subtotal + shipping;
+        
+        // Simulate order creation
+        const orderId = 'ORD-' + Date.now();
+        
+        // Clear cart
+        cart = [];
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        
+        hideLoadingOverlay();
+        showNotification(`Order placed successfully! Order ID: ${orderId}. Pay ${total.toFixed(2)} USD on delivery.`, 'success');
+        
+        // Redirect to orders
+        showSection('orders');
+        
+    } catch (error) {
+        hideLoadingOverlay();
+        console.error('Order error:', error);
+        showNotification('Unable to place order. Please try again.', 'error');
+    }
 }
 
 async function processPayment(e) {
@@ -638,7 +740,8 @@ async function processPayment(e) {
             cardHolderName: cardName,
             expiryMonth: month.padStart(2, '0'),
             expiryYear: fullYear,
-            cvv: cvv
+            cvv: cvv,
+            shippingAddress: window.checkoutInfo ? window.checkoutInfo.shippingAddress : null
         };
         
         const response = await fetch(`${API_CONFIG.PAYMENT_SERVICE}/api/v1/payments/process`, {
@@ -662,7 +765,18 @@ async function processPayment(e) {
             bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
             
             hideLoadingOverlay();
-            showNotification(`Payment successful! Transaction ID: ${result.transactionId}`, 'success');
+            
+            // Show detailed success message with order info
+            const orderInfo = `
+                Payment successful! 
+                Transaction ID: ${result.transactionId}
+                Amount: $${total.toFixed(2)}
+                Shipping to: ${window.checkoutInfo.shippingAddress.city}, ${window.checkoutInfo.shippingAddress.state}
+            `;
+            showNotification(orderInfo, 'success');
+            
+            // Clear checkout info
+            window.checkoutInfo = null;
             
             // Redirect to orders
             showSection('orders');
