@@ -35,6 +35,9 @@ spring:
 # Service Discovery
 eureka:
   client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
     service-url:
       defaultZone: http://eureka-server:8761/eureka/
   instance:
