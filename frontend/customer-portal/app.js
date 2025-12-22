@@ -727,14 +727,19 @@ async function processPayment(e) {
     const shipping = subtotal > 50 ? 0 : 5.99;
     const total = subtotal + shipping;
     
+    // Validate User ID
+    const userId = currentUser?.id || currentUser?.userId;
+    if (!userId) {
+        showNotification('Session invalid. Please login again.', 'error');
+        return;
+    }
+
     try {
         showLoadingOverlay('Processing payment...');
         
         const paymentData = {
             orderId: Date.now(), // Temporary order ID
-            // `currentUser` is stored with an `id` field on login/register.
-            // Using `currentUser.userId` sends undefined/null and can cause backend validation failures.
-            userId: currentUser?.id,
+            userId: userId,
             amount: total,
             currency: 'USD',
             paymentMethod: 'CREDIT_CARD',
