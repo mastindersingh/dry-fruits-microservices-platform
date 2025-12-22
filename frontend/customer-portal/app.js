@@ -732,7 +732,9 @@ async function processPayment(e) {
         
         const paymentData = {
             orderId: Date.now(), // Temporary order ID
-            userId: currentUser.userId,
+            // `currentUser` is stored with an `id` field on login/register.
+            // Using `currentUser.userId` sends undefined/null and can cause backend validation failures.
+            userId: currentUser?.id,
             amount: total,
             currency: 'USD',
             paymentMethod: 'CREDIT_CARD',
